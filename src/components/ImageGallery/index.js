@@ -11,6 +11,7 @@ export default function ImageGallery(props) {
                     key={image.id}
                     imageObj={image}
                     searchQuery={props.searchQuery}
+                    clickHandler={props.onImageClickHandler}
                 />
             ))}
         </ul>
