@@ -1,21 +1,23 @@
 import React from "react";
-import { SRLWrapper } from "simple-react-lightbox";
+import styles from "./Lightbox.module.css";
 
-export default function Lightbox(props) {
-    const imagesForOverlay = props.images.map((image) => {
-        return {
-            src: image.largeImageURL,
-            thumbnail: image.webformatURL,
-        };
-    });
-    return (
-        <div className="MyComponent">
-            <SRLWrapper images={imagesForOverlay} />
-        </div>
-    );
+export default class Lightbox extends React.Component {
+    componentDidMount() {
+        window.addEventListener("keydown", this.props.closeEsc);
+    }
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.props.closeEsc);
+    }
+    render() {
+        return (
+            <div
+                className={styles.Overlay}
+                onClick={this.props.onBackDropClick}
+            >
+                <div className={styles.Modal}>
+                    <img src={this.props.imageUrl} alt="" width="800" />
+                </div>
+            </div>
+        );
+    }
 }
-// function onEscClickHandler(event) {
-//     if (event.target.code === "Escape") {
-//         instance.close();
-//     }
-// }

@@ -5,11 +5,10 @@ import styles from "./Loader.module.css";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 export default class LoaderComp extends React.Component {
-    //other logic
     render() {
         return (
             <div className={styles.Loader}>
-                <Loader type="Oval" color="#3f51b5" height={100} width={100} />
+                <Loader type="Oval" color="#3f51b5" height={100} width={100} timeout={10000}/>
             </div>
         );
     }

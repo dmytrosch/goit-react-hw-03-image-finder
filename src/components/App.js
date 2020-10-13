@@ -8,7 +8,6 @@ import Searchbar from "./Searchbar";
 import ImageGallery from "./ImageGallery/";
 import Button from "./Button";
 import Loader from "./Loader";
-import SimpleReactLightbox from "simple-react-lightbox";
 import Lightbox from "./Lightbox";
 
 export default class App extends React.Component {
@@ -17,12 +16,13 @@ export default class App extends React.Component {
         images: [],
         page: 1,
         loading: false,
+        overlay: false,
+        overlayImg: null,
     };
 
     searchFormHandler = (event) => {
         event.preventDefault();
         const searchQuery = event.target.elements.query.value;
-        console.log("search", searchQuery);
         this.setState({
             searchQuery,
             page: 1,
@@ -30,21 +30,43 @@ export default class App extends React.Component {
         });
     };
     onLoadMoreBtnHandler = () => {
-        console.log("here");
         this.setState((prevState) => ({
             page: prevState.page + 1,
         }));
     };
-    // onImageClickHandler = (event) => {
-    //     const fullSizeUrl = event.target.dataset.full;
-    //     lightbox(fullSizeUrl);
-    // };
+    onImageClickHandler = (event) => {
+        event.preventDefault();
+        this.toggleLoadingState();
+        const fullSizeUrl = event.target.dataset.full;
+        this.setState({
+            overlay: true,
+            overlayImg: fullSizeUrl,
+        });
+        this.hideSpinner();
+    };
+    onEscClickHandler = (event) => {
+        console.log("e");
+        if (event.code === "Escape") {
+            this.setState({
+                overlay: false,
+            });
+        }
+    };
+    onBackDropClickHandler = (event) => {
+        console.log(event.target, event.currentTarget);
+        if (event.target === event.currentTarget) {
+            this.setState({
+                overlay: false,
+            });
+        }
+    };
     componentDidUpdate(prevProps, prevState) {
         if (prevState.page !== this.state.page) {
-            this.getImages();
-            window.scrollTo({
-                top: document.scrollHeight,
-                behavior: "smooth",
+            this.getImages().then(() => {
+                window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: "smooth",
+                });
             });
         }
         if (prevState.searchQuery !== this.state.searchQuery) {
@@ -53,6 +75,11 @@ export default class App extends React.Component {
     }
     componentDidMount() {
         this.getImages();
+    }
+    removeOverlay() {
+        this.setState({
+            overlay: false,
+        });
     }
     async getImages() {
         const { page, searchQuery } = this.state;
@@ -67,7 +94,6 @@ export default class App extends React.Component {
     hideSpinner() {
         const intervalId = setInterval(() => {
             const loadingState = document.readyState;
-            console.log(loadingState);
             if (loadingState === "complete") {
                 clearInterval(intervalId);
                 this.toggleLoadingState();
@@ -75,41 +101,42 @@ export default class App extends React.Component {
         }, 500);
     }
     toggleLoadingState() {
-        console.log(this.state.loading, "loading state");
         this.setState((prevState) => ({
             loading: !prevState.loading,
         }));
     }
 
     render() {
-        const { images, loading } = this.state;
+        const { images, loading, overlayImg, overlay } = this.state;
         return (
             <>
                 {loading && <Loader />}
+                {overlay && (
+                    <Lightbox
+                        imageUrl={overlayImg}
+                        closeEsc={this.onEscClickHandler}
+                        onBackDropClick={this.onBackDropClickHandler}
+                    />
+                )}
                 <div
-                    className={`${styles.App} App`}
+                    className={`${styles.App}`}
                     data-lay={loading && "semitransparent"}
                 >
-                    <SimpleReactLightbox>
-                        <Lightbox images={images}/>
-                        <Searchbar submitHandler={this.searchFormHandler} />
-                        <main>
-                            {images.length > 0 && (
-                                <>
-                                    <ImageGallery
-                                        images={images}
-                                        searchQuery={this.state.searchQuery}
-                                        onImageClickHandler={
-                                            this.onImageClickHandler
-                                        }
-                                    />
-                                    <Button
-                                        handler={this.onLoadMoreBtnHandler}
-                                    />
-                                </>
-                            )}
-                        </main>
-                    </SimpleReactLightbox>
+                    <Searchbar submitHandler={this.searchFormHandler} />
+                    <main>
+                        {images.length > 0 && (
+                            <>
+                                <ImageGallery
+                                    images={images}
+                                    searchQuery={this.state.searchQuery}
+                                    onImageClickHandler={
+                                        this.onImageClickHandler
+                                    }
+                                />
+                                <Button handler={this.onLoadMoreBtnHandler} />
+                            </>
+                        )}
+                    </main>
                 </div>
             </>
         );
