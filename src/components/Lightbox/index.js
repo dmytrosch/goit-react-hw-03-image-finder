@@ -1,7 +1,13 @@
 import React from "react";
+import PropTypes from "prop-types";
 import styles from "./Lightbox.module.css";
 
 export default class Lightbox extends React.Component {
+    static propTypes = {
+        closeEsc: PropTypes.func.isRequired,
+        onBackDropClick: PropTypes.func.isRequired,
+        imageUrl: PropTypes.string.isRequired,
+    };
     componentDidMount() {
         window.addEventListener("keydown", this.props.closeEsc);
     }

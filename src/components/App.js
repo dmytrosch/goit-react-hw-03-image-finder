@@ -45,7 +45,6 @@ export default class App extends React.Component {
         this.hideSpinner();
     };
     onEscClickHandler = (event) => {
-        console.log("e");
         if (event.code === "Escape") {
             this.setState({
                 overlay: false,
@@ -53,7 +52,6 @@ export default class App extends React.Component {
         }
     };
     onBackDropClickHandler = (event) => {
-        console.log(event.target, event.currentTarget);
         if (event.target === event.currentTarget) {
             this.setState({
                 overlay: false,

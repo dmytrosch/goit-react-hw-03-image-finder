@@ -1,5 +1,6 @@
 import React from "react";
-import styles from './Searchbar.module.css';
+import PropTypes from "prop-types";
+import styles from "./Searchbar.module.css";
 
 export default function Searchbar(props) {
     return (
@@ -21,3 +22,7 @@ export default function Searchbar(props) {
         </header>
     );
 }
+
+Searchbar.propTypes = {
+    submitHandler: PropTypes.func.isRequired,
+};
